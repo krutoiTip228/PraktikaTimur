@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using CSharpPraktikum.Common;
 using CSharpPraktikum.Tasks.Level1;
-
+using CSharpPraktikum.Tasks.Level2;
 namespace CSharpPraktikum.Menu;
 
 public class MenuRunner
 {
     private readonly List<ITask> _level1Tasks = new();
+    private readonly List<ITask> _level2Tasks = new();
 
     public MenuRunner()
     {
@@ -26,6 +27,23 @@ public class MenuRunner
         _level1Tasks.Add(new Task12_Palindrom());
         _level1Tasks.Add(new Task13_Dictionary());
         _level1Tasks.Add(new Task14_Age());
+
+
+
+
+        _level2Tasks.Add(new Task16_StringExtensions());
+        _level2Tasks.Add(new Task17_Concat());
+        _level2Tasks.Add(new Task18_TryParseVsTryCatch());
+        _level2Tasks.Add(new Task19_Stek());
+        _level2Tasks.Add(new Task20_SwapMaxIComparable());
+        _level2Tasks.Add(new Task21_enum());
+        _level2Tasks.Add(new Task22_Params());
+        _level2Tasks.Add(new Task23_Nullable());
+        _level2Tasks.Add(new Task24_oop());
+        _level2Tasks.Add(new Task25_InterfaceIShape());
+        _level2Tasks.Add(new Task26_PatternStrategy());
+            
+            
     }
 
     public void Run()
@@ -45,7 +63,10 @@ public class MenuRunner
             switch (input)
             {
                 case "1":
-                    ShowLevel1Menu();
+                    ShowLevel1Menu(); 
+                    break;
+                case "2":
+                    ShowLevel2Menu(); 
                     break;
                 case "4":
                     return;
@@ -90,7 +111,43 @@ public class MenuRunner
             }
         }
     }
+    private void ShowLevel2Menu()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("--- Уровень 2: Средний ---");
 
+            for (int i = 0; i < _level2Tasks.Count; i++)
+            {
+              
+                Console.WriteLine($"{i + 16}. {_level2Tasks[i].Title}");
+            }
+
+            Console.WriteLine("0. Назад");
+            Console.Write("\nВыберите задание: ");
+
+            string? input = Console.ReadLine();
+
+            if (input == "0")
+                return;
+
+            
+            if (int.TryParse(input, out int taskNumber)
+                && taskNumber >= 16
+                && taskNumber <= 15 + _level2Tasks.Count)
+            {
+            
+                RunTask(_level2Tasks[taskNumber - 16]);
+            }
+            else
+            {
+                Console.WriteLine("Неверный номер задания. Нажмите Enter...");
+                Console.ReadLine();
+            }
+        }
+    }
+    
     private void RunTask(ITask task)
     {
         Console.Clear();
