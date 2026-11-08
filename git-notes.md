@@ -10,3 +10,10 @@
 * | bb09fab docs: edit readme in main
 |/
 * 2ec481a docs: add readme in main
+
+## Task 35 — Branches & PR
+### PR link
+https://github.com/succocker/Praktika2026/pull/1
+
+### Rebase result
+6d25e9a (HEAD -> feature/rebase-demo) feat: complete tasks 16-26 (level 2)
