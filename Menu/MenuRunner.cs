@@ -42,8 +42,15 @@ public class MenuRunner
         _level2Tasks.Add(new Task24_oop());
         _level2Tasks.Add(new Task25_InterfaceIShape());
         _level2Tasks.Add(new Task26_PatternStrategy());
-            
-            
+        _level2Tasks.Add(new Task27_IComparableIComparerTforStudent());
+        _level2Tasks.Add(new Task28_EqualsGetHashCode());
+        _level2Tasks.Add(new Task29_FabricPattern());
+        _level2Tasks.Add(new Task30_BankAccount());
+        _level2Tasks.Add(new Task31_IDisposable());
+        _level2Tasks.Add(new Task32_temperatura());
+        _level2Tasks.Add(new Task33_EmployeesLinq());
+        _level2Tasks.Add(new Task34_GrupirSlov());
+
     }
 
     public void Run()
