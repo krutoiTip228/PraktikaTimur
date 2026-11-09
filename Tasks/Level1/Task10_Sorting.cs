@@ -6,102 +6,92 @@ namespace CSharpPraktikum.Tasks.Level1;
 
 public class Task10_Sorting : ITask
 {
+    private const int ArraySize = 10_000;
 
     public string Title => "10.Сортировка пузырьком + вставками";
     public string Description => "отсортировать массив двумя алгоритмами.";
-    public string[] Requirements => new[] {
-
-    "Реализовать BubbleSort и InsertionSort отдельными методами.",
-    "Оба — без LINQ и Array.Sort.",
-    "Замерить время каждого через Stopwatch на массиве 10 000 элементов.",
-    "Вывести оба времени."
+    public string[] Requirements => new[]
+    {
+        "Реализовать BubbleSort и InsertionSort отдельными методами.",
+        "Оба — без LINQ и Array.Sort.",
+        "Замерить время каждого через Stopwatch на массиве 10 000 элементов.",
+        "Вывести оба времени."
     };
 
     public void Run()
     {
-        int razmer = 10000;
-        Random rand = new Random();
+        var random = new Random();
+        int[] source = new int[ArraySize];
+        for (int i = 0; i < source.Length; i++)
+            source[i] = random.Next(1, 10_000);
 
-        int[] massiv1 = new int[razmer];
-        int[] massiv2 = new int[razmer];
+        // Каждому алгоритму — своя копия одних и тех же данных
+        int[] forBubble = (int[])source.Clone();
+        int[] forInsertion = (int[])source.Clone();
 
-        for (int i = 0; i < razmer; i++)
-        {
-            int num = rand.Next(1, 10000);
-            massiv1[i] = num;
-            massiv2[i] = num;
-        }
-        Console.WriteLine($"Массив из {razmer} элементов создан. Начинаем сортировку...\n");
+        Console.WriteLine($"Массив из {ArraySize} элементов создан. Начинаем сортировку...\n");
 
-        Stopwatch sw1 = Stopwatch.StartNew();
-        BubbleSort(massiv1);
-        sw1.Stop();
-        Console.WriteLine($"Пузырьковая сортировка: {sw1.ElapsedMilliseconds} мс");
+        long bubbleMs = MeasureMilliseconds(() => BubbleSort(forBubble));
+        Console.WriteLine($"Пузырьковая сортировка: {bubbleMs} мс");
 
+        long insertionMs = MeasureMilliseconds(() => InsertionSort(forInsertion));
+        Console.WriteLine($"Сортировка вставками:   {insertionMs} мс");
 
-
-        Stopwatch sw2 = Stopwatch.StartNew();
-        InsertionSort(massiv2);
-        sw2.Stop();
-        Console.WriteLine($" Сортировка вставками: {sw2.ElapsedMilliseconds} мс");
-
-
-        bool isEqual = true;
-        for (int i = 0; i < razmer; i++)
-        {
-            if (massiv1[i] == massiv2[i])
-            {
-                isEqual = false;
-                break;
-            }
-
-        }
-        Console.WriteLine($"\nРезультаты сортировок совпадают: {isEqual}");
-
+        Console.WriteLine($"\nРезультаты сортировок совпадают: {AreEqual(forBubble, forInsertion)}");
     }
-    
-    private void BubbleSort(int[] arr)
-    {
-        int n = arr.Length;
-        for (int i = 0; i < n; i++) {
 
+    private static long MeasureMilliseconds(Action action)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        action();
+        stopwatch.Stop();
+        return stopwatch.ElapsedMilliseconds;
+    }
+
+    private static bool AreEqual(int[] first, int[] second)
+    {
+        if (first.Length != second.Length) return false;
+
+        for (int i = 0; i < first.Length; i++)
+        {
+            if (first[i] != second[i]) return false;
+        }
+        return true;
+    }
+
+    private static void BubbleSort(int[] array)
+    {
+        for (int pass = 0; pass < array.Length - 1; pass++)
+        {
             bool swapped = false;
-            for (int j = 0; j < n - 1 - i; j++)
+
+            for (int j = 0; j < array.Length - 1 - pass; j++)
             {
-                if (arr[j] > arr[j + 1])
+                if (array[j] > array[j + 1])
                 {
-                  
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
+                    (array[j], array[j + 1]) = (array[j + 1], array[j]);
                     swapped = true;
                 }
             }
-           
-            if (!swapped) break;
+
+            if (!swapped) break; // массив уже отсортирован
         }
     }
 
-private void InsertionSort(int[] arr)
+    private static void InsertionSort(int[] array)
     {
-        int n = arr.Length;
-        for (int i = 1; i < n; i++)
+        for (int i = 1; i < array.Length; i++)
         {
-            int key = arr[i]; 
+            int key = array[i];
             int j = i - 1;
 
-           
-            while (j >= 0 && arr[j] > key)
+            while (j >= 0 && array[j] > key)
             {
-                arr[j + 1] = arr[j];
-                j = j - 1;
+                array[j + 1] = array[j];
+                j--;
             }
-        
-            arr[j + 1] = key;
+
+            array[j + 1] = key;
         }
     }
 }
-
-
-
-

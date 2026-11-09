@@ -1,73 +1,56 @@
 using System;
-using CSharpPraktikum.Common;
 using System.Collections.Generic;
+using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
 
-
 public class Task23_Nullable : ITask
 {
-    public string Title => "Nullable-типы, ??, ?.";
+    private readonly Dictionary<string, int> _database = new()
+    {
+        ["яблоко"] = 10,
+        ["банан"] = 20
+    };
+
+    public string Title => "Nullable-типы, ??, ?.";
     public string Description => "продемонстрировать работу с nullable.";
     public string[] Requirements => new[]
     {
-        "Метод nt? FindValue(string key) — возвращает null, если ключа нет.",
-        "Использовать ?? для значения по умолчанию.",
-        "Использовать ?. для безопасного доступа к свойству объекта, который может быть null.",
-        "Использовать HasValue / Value с проверкой.",
+        "Метод int? FindValue(string key) — возвращает null, если ключа нет.",
+        "Использовать ?? для значения по умолчанию.",
+        "Использовать ?. для безопасного доступа к свойству объекта, который может быть null.",
+        "Использовать HasValue / Value с проверкой.",
         "Продемонстрировать на примере с найденным и ненайденным ключом."
     };
 
     public void Run()
     {
-  
-        var database = new Dictionary<string, int>
-        {
-            { "яблоко", 10 },
-            { "банан", 20 }
-        };
-
         Console.WriteLine("--- Тестируем FindValue и nullable ---");
 
-     
-        int? foundValue = FindValue(database, "яблоко");
-        Console.WriteLine($"Ключ 'яблоко': {foundValue}"); 
+        int? found = FindValue("яблоко");
+        int? notFound = FindValue("апельсин");
 
-    
-        int? notFoundValue = FindValue(database, "апельсин");
-        Console.WriteLine($"Ключ 'апельсин': {notFoundValue.HasValue}"); 
+        Console.WriteLine($"Ключ 'яблоко': {found}");
+        Console.WriteLine($"Ключ 'апельсин' найден? {notFound.HasValue}");
+        Console.WriteLine($"notFound ?? 0 = {notFound ?? 0}");
 
-   
-        int defaultValue = notFoundValue ?? 0;
-        Console.WriteLine($"notFoundValue ?? 0 = {defaultValue}");
+        if (found.HasValue)
+            Console.WriteLine($"Точное значение: {found.Value}");
 
-        Person? person1 = new Person { Name = "Иван" };
-        Person? person2 = null;
+        Console.WriteLine("\n--- Оператор ?. ---");
 
-        string? name1 = person1?.Name;
-        string? name2 = person2?.Name;
+        Person? withName = new Person { Name = "Иван" };
+        Person? nobody = null;
 
-        Console.WriteLine($"Имя person1: {name1 ?? "Неизвестно"}");
-        Console.WriteLine($"Имя person2: {name2 ?? "Неизвестно"}");
-
-        if (foundValue.HasValue)
-        {
-    
-            Console.WriteLine($"Точное значение: {foundValue.Value}");
-        }
+        Console.WriteLine($"Имя первого человека: {withName?.Name ?? "Неизвестно"}");
+        Console.WriteLine($"Имя второго человека: {nobody?.Name ?? "Неизвестно"}");
     }
 
-    
-    private int? FindValue(Dictionary<string, int> db, string key)
+    private int? FindValue(string key)
     {
-        if (db.TryGetValue(key, out int result))
-        {
-            return result;
-        }
-        return null;
+        return _database.TryGetValue(key, out int value) ? value : null;
     }
 }
-
 
 public class Person
 {

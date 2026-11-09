@@ -18,31 +18,25 @@ public class Task28_EqualsGetHashCode : ITask
 
     public void Run()
     {
-        Point p1 = new Point(5, 10);
-        Point p2 = new Point(5, 10);
-        Point p3 = new Point(3, 7);
+        var p1 = new Point(5, 10);
+        var p2 = new Point(5, 10);
+        var p3 = new Point(3, 7);
 
         Console.WriteLine("Проверка Equals");
-        Console.WriteLine($"p1: {p1}");
-        Console.WriteLine($"p2: {p2}");
+        Console.WriteLine($"p1 = {p1}, p2 = {p2}, p3 = {p3}");
         Console.WriteLine($"p1.Equals(p2): {p1.Equals(p2)}");
-        Console.WriteLine($"p1 == p3: {p1 == p3}");
-        Console.WriteLine();
+        Console.WriteLine($"p1 == p2: {p1 == p2}");
+        Console.WriteLine($"p1 == p3: {p1 == p3}\n");
 
         Console.WriteLine("Проверка HashSet");
-
-        HashSet<Point> set = new HashSet<Point>();
-
-        set.Add(p1);
-        set.Add(p2);
-        set.Add(p3);
-
-        Console.WriteLine($"Добавили 3 точки. Количество в HashSet: {set.Count}");
+        var set = new HashSet<Point> { p1, p2, p3 };
+        Console.WriteLine($"Добавили 3 точки (две одинаковые). Количество в HashSet: {set.Count}");
     }
-    public class Point : IEquatable<Point>
+
+    public sealed class Point : IEquatable<Point>
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int X { get; }
+        public int Y { get; }
 
         public Point(int x, int y)
         {
@@ -52,32 +46,17 @@ public class Task28_EqualsGetHashCode : ITask
 
         public bool Equals(Point? other)
         {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return X == other.X && Y == other.Y;
+            return other is not null && X == other.X && Y == other.Y;
         }
 
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Point);
-        }
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(X, Y);
-        }
-        public static bool operator ==(Point? left, Point? right)
-        {
-            return Equals(left, right);
-        }
+        public override bool Equals(object? obj) => Equals(obj as Point);
 
-        public static bool operator !=(Point? left, Point? right)
-        {
-            return !Equals(left, right);
-        }
-        public override string ToString()
-        {
-            return $"({X}, {Y})";
-        }
+        // Должен совпадать для равных точек — иначе HashSet не найдёт дубликат
+        public override int GetHashCode() => HashCode.Combine(X, Y);
+
+        public static bool operator ==(Point? left, Point? right) => Equals(left, right);
+        public static bool operator !=(Point? left, Point? right) => !Equals(left, right);
+
+        public override string ToString() => $"({X}, {Y})";
     }
 }

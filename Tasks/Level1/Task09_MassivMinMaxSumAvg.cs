@@ -5,92 +5,75 @@ namespace CSharpPraktikum.Tasks.Level1;
 
 public class Task09_MassivMinMaxSumAvg : ITask
 {
+    private const int ArraySize = 20;
 
     public string Title => "9.Массивы: min/max/sum/avg";
     public string Description => "для массива чисел найти минимум, максимум, сумму и среднее.";
-    public string[] Requirements => new[] {
-
-    "Заполнить массив (например, случайными числами 1–100, размер 20).",
-    "Реализовать без LINQ (Min/Max/Sum/Average запрещены).",
-    "Оформить 4 отдельных метода.",
-    "Пустой массив — обработать (вернуть ошибку или 0, но не падать)."
+    public string[] Requirements => new[]
+    {
+        "Заполнить массив (например, случайными числами 1–100, размер 20).",
+        "Реализовать без LINQ (Min/Max/Sum/Average запрещены).",
+        "Оформить 4 отдельных метода.",
+        "Пустой массив — обработать (вернуть ошибку или 0, но не падать)."
     };
 
     public void Run()
     {
-        int[] massive = new int [20];
-        Random rand = new Random();
+        int[] numbers = CreateRandomArray(ArraySize);
 
-        for(int i = 0; i<massive.Length; i++)
-        {
-            massive[i] = rand.Next(1,101);
-        }
-        Console.WriteLine("Массив: " + string.Join(", ", massive));
+        Console.WriteLine("Массив: " + string.Join(", ", numbers));
         Console.WriteLine();
-
-       
-        Console.WriteLine($"Минимум:  {FindMin(massive)}");
-        Console.WriteLine($"Максимум: {FindMax(massive)}");
-        Console.WriteLine($"Сумма:    {FindSum(massive)}");
-        Console.WriteLine($"Среднее:  {FindAverage(massive):F2}"); 
+        Console.WriteLine($"Минимум:  {FindMin(numbers)}");
+        Console.WriteLine($"Максимум: {FindMax(numbers)}");
+        Console.WriteLine($"Сумма:    {FindSum(numbers)}");
+        Console.WriteLine($"Среднее:  {FindAverage(numbers):F2}");
     }
 
-   
-    private int FindMin(int[] arr)
+    private static int[] CreateRandomArray(int size)
     {
+        var random = new Random();
+        int[] array = new int[size];
 
-        if (arr.Length == 0) return 0;
+        for (int i = 0; i < array.Length; i++)
+            array[i] = random.Next(1, 101);
 
-        int min = arr[0]; 
-        for (int i = 1; i < arr.Length; i++)
+        return array;
+    }
+
+    private static int FindMin(int[] array)
+    {
+        if (array.Length == 0) return 0;
+
+        int min = array[0];
+        foreach (int value in array)
         {
-            if (arr[i] < min)
-            {
-                min = arr[i]; 
-            }
+            if (value < min) min = value;
         }
         return min;
     }
 
-
-    private int FindMax(int[] arr)
+    private static int FindMax(int[] array)
     {
-        if (arr.Length == 0) return 0;
+        if (array.Length == 0) return 0;
 
-        int max = arr[0]; 
-        for (int i = 1; i < arr.Length; i++)
+        int max = array[0];
+        foreach (int value in array)
         {
-            if (arr[i] > max)
-            {
-                max = arr[i]; 
-            }
+            if (value > max) max = value;
         }
         return max;
     }
 
-    
-    private int FindSum(int[] arr)
+    private static int FindSum(int[] array)
     {
-        if (arr.Length == 0) return 0;
-
         int sum = 0;
-        for (int i = 0; i < arr.Length; i++)
-        {
-            sum += arr[i];
-        }
+        foreach (int value in array)
+            sum += value;
         return sum;
     }
 
-
-    private double FindAverage(int[] arr)
+    private static double FindAverage(int[] array)
     {
-        if (arr.Length == 0) return 0;
-
-
-        int sum = FindSum(arr);
-
-
-        return (double)sum / arr.Length;
+        return array.Length == 0 ? 0 : (double)FindSum(array) / array.Length;
     }
 }
-    

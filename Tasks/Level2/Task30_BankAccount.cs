@@ -18,37 +18,36 @@ public class Task30_BankAccount : ITask
 
     public void Run()
     {
-        BankAccount account = new BankAccount("Кирилл", 1000m);
+        var account = new BankAccount("Кирилл", 1000m);
+        Console.WriteLine($"Счёт открыт. Владелец: {account.OwnerName}, баланс: {account.Balance} руб.\n");
 
-        Console.WriteLine($"Счет открыт. Владелец: {account.OwnerName}, Баланс: {account.Balance} руб.\n");
         account.Deposit(500m);
-        Console.WriteLine($"После пополнения на 500: Баланс = {account.Balance} руб.");
+        Console.WriteLine($"После пополнения на 500: баланс = {account.Balance} руб.");
+
+        TryWithdraw(account, 1200m);
+        TryWithdraw(account, 5000m);
+    }
+
+    private static void TryWithdraw(BankAccount account, decimal amount)
+    {
+        Console.WriteLine($"\nПытаемся снять {amount} руб...");
 
         try
         {
-            account.Withdraw(1200m);
-            Console.WriteLine($"Успешно снято 1200. Новый баланс: {account.Balance} руб.");
+            account.Withdraw(amount);
+            Console.WriteLine($"Успешно. Новый баланс: {account.Balance} руб.");
         }
         catch (InsufficientFundsException ex)
         {
-            Console.WriteLine($"ОШИБКА при снятии: {ex.Message}");
-        }
-        try
-        {
-            Console.WriteLine("\nПытаемся снять 5000 руб...");
-            account.Withdraw(5000m);
-        }
-        catch (InsufficientFundsException ex)
-        {
-            Console.WriteLine($"ПОЙМАНО ИСКЛЮЧЕНИЕ: {ex.Message}");
-            Console.WriteLine($"Текущий баланс остался: {account.Balance} руб.");
+            Console.WriteLine($"ОШИБКА: {ex.Message}");
+            Console.WriteLine($"Баланс остался: {account.Balance} руб.");
         }
     }
 }
+
 public class BankAccount
 {
-    public string OwnerName { get; private set; }
-
+    public string OwnerName { get; }
     public decimal Balance { get; private set; }
 
     public BankAccount(string ownerName, decimal initialBalance)
@@ -60,7 +59,7 @@ public class BankAccount
     public void Deposit(decimal amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Сумма пополнения должна быть больше нуля.");
+            throw new ArgumentException("Сумма пополнения должна быть больше нуля.", nameof(amount));
 
         Balance += amount;
     }
@@ -68,23 +67,22 @@ public class BankAccount
     public void Withdraw(decimal amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Сумма снятия должна быть больше нуля.");
+            throw new ArgumentException("Сумма снятия должна быть больше нуля.", nameof(amount));
 
         if (amount > Balance)
-        {
             throw new InsufficientFundsException(Balance, amount);
-        }
 
         Balance -= amount;
     }
 }
+
 public class InsufficientFundsException : Exception
 {
     public decimal CurrentBalance { get; }
     public decimal RequestedAmount { get; }
 
     public InsufficientFundsException(decimal balance, decimal requested)
-        : base($"Недостаточно средств. На счете: {balance} руб., запрошено: {requested} руб.")
+        : base($"Недостаточно средств. На счёте: {balance} руб., запрошено: {requested} руб.")
     {
         CurrentBalance = balance;
         RequestedAmount = requested;

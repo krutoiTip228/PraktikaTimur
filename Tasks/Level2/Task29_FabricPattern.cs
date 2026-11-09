@@ -14,64 +14,51 @@ public class Task29_FabricPattern : ITask
         "NotificationFactory.Create(NotificationType type) — возвращает нужную реализацию",
         "enum NotificationType { Email, Sms, Push }"
     };
+
     public void Run()
     {
         Console.WriteLine("Тест фабрики уведомлений");
 
-        INotification email = NotificationFactory.Create(NotificationType.Email);
-        INotification sms = NotificationFactory.Create(NotificationType.Sms);
-        INotification push = NotificationFactory.Create(NotificationType.Push);
-
-
-
-        email.Send("Ваш заказ отправлен");
-        sms.Send("Пришёл код подтверждения");
-        push.Send("Пришло новое сообщение");
+        NotificationFactory.Create(NotificationType.Email).Send("Ваш заказ отправлен");
+        NotificationFactory.Create(NotificationType.Sms).Send("Пришёл код подтверждения");
+        NotificationFactory.Create(NotificationType.Push).Send("Пришло новое сообщение");
     }
 }
 
 public enum NotificationType
 {
-    Email, Sms, Push
+    Email,
+    Sms,
+    Push
 }
+
 public interface INotification
 {
     void Send(string message);
 }
+
 public class EmailNotification : INotification
 {
-    public void Send(string message)
-    {
-        Console.WriteLine($"[EMAIL] Отправлено: {message}");
-    }
+    public void Send(string message) => Console.WriteLine($"[EMAIL] Отправлено: {message}");
 }
 
 public class SmsNotification : INotification
 {
-    public void Send(string message)
-    {
-        Console.WriteLine($"[SMS] Отправлено: {message}");
-    }
+    public void Send(string message) => Console.WriteLine($"[SMS] Отправлено: {message}");
 }
+
 public class PushNotification : INotification
 {
-    public void Send(string message)
-    {
-
-        Console.WriteLine($"[PUSH] Отправлено: {message}");
-
-    }
+    public void Send(string message) => Console.WriteLine($"[PUSH] Отправлено: {message}");
 }
+
 public static class NotificationFactory
 {
-    public static INotification Create(NotificationType type)
+    public static INotification Create(NotificationType type) => type switch
     {
-        return type switch
-        {
-            NotificationType.Email => new EmailNotification(),
-            NotificationType.Sms => new SmsNotification(),
-            NotificationType.Push => new PushNotification(),
-            _ => throw new ArgumentException("Неизвестный тип уведомления")
-        };
-    }
-} 
+        NotificationType.Email => new EmailNotification(),
+        NotificationType.Sms => new SmsNotification(),
+        NotificationType.Push => new PushNotification(),
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Неизвестный тип уведомления")
+    };
+}
