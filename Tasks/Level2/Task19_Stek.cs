@@ -3,22 +3,31 @@ using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
 
-
 public class Task19_Stek : ITask
 {
     public string Title => "Свой стек/очередь на массиве";
-    public string Description => "реализовать `MyStack<T>` и `MyQueue<T>` на массиве.  ";
+    public string Description => "реализовать `MyStack<T>` и `MyQueue<T>` на массиве.  ";
     public string[] Requirements => new[]
     {
-        "Стек: `Push`, `Pop`, `Peek`, `Count`, `IsEmpty`.",
-        "Очередь: `Enqueue`, `Dequeue`, `Peek`, `Count`, `IsEmpty`.",
+        "Стек: `Push`, `Pop`, `Peek`, `Count`, `IsEmpty`.",
+        "Очередь: `Enqueue`, `Dequeue`, `Peek`, `Count`, `IsEmpty`.",
         "При переполнении — расширять внутренний массив (удвоение).",
-        "`Pop`/`Dequeue` на пустой коллекции — бросать `InvalidOperationException`."
+        "`Pop`/`Dequeue` на пустой коллекции — бросать `InvalidOperationException`."
     };
+
     public void Run()
     {
-        Console.WriteLine("Тестируем MyStack (Стек: LIFO - последний зашел, первый вышел)");
-        MyStack<int> stack = new MyStack<int>();
+        DemoStack();
+        Console.WriteLine();
+        DemoQueue();
+        Console.WriteLine();
+        DemoEmptyCollections();
+    }
+
+    private static void DemoStack()
+    {
+        Console.WriteLine("Тестируем MyStack (LIFO — последний зашёл, первый вышел)");
+        var stack = new MyStack<int>();
 
         stack.Push(10);
         stack.Push(20);
@@ -29,10 +38,12 @@ public class Task19_Stek : ITask
         Console.WriteLine($"Извлекаем (Pop): {stack.Pop()}");
         Console.WriteLine($"Размер стека теперь: {stack.Count}");
         Console.WriteLine($"Пустой? {stack.IsEmpty()}");
-        Console.WriteLine();
+    }
 
-        Console.WriteLine("Тестируем MyQueue (Очередь: FIFO - первый зашел, первый вышел)");
-        MyQueue<string> queue = new MyQueue<string>();
+    private static void DemoQueue()
+    {
+        Console.WriteLine("Тестируем MyQueue (FIFO — первый зашёл, первый вышел)");
+        var queue = new MyQueue<string>();
 
         queue.Enqueue("Первый");
         queue.Enqueue("Второй");
@@ -43,53 +54,41 @@ public class Task19_Stek : ITask
         Console.WriteLine($"Извлекаем (Dequeue): {queue.Dequeue()}");
         Console.WriteLine($"Размер очереди теперь: {queue.Count}");
         Console.WriteLine($"Пустая? {queue.IsEmpty()}");
-        Console.WriteLine();
+    }
 
+    private static void DemoEmptyCollections()
+    {
         Console.WriteLine("Проверка ошибки при извлечении из пустой коллекции");
-        try
-        {
-            stack.Pop();
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.WriteLine($"Поймано исключение: {ex.Message}");
-        }
+
+        try { new MyStack<int>().Pop(); }
+        catch (InvalidOperationException ex) { Console.WriteLine($"Стек: {ex.Message}"); }
+
+        try { new MyQueue<int>().Dequeue(); }
+        catch (InvalidOperationException ex) { Console.WriteLine($"Очередь: {ex.Message}"); }
     }
 }
 
 public class MyStack<T>
 {
-    private T[] _items;
-    private int _count;
+    private const int InitialCapacity = 4;
+    private T[] _items = new T[InitialCapacity];
 
-    public MyStack()
-    {
-        _items = new T[4]; 
-        _count = 0;
-    }
+    public int Count { get; private set; }
 
-    public int Count => _count;
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty() => Count == 0;
 
     public void Push(T item)
     {
+        if (Count == _items.Length)
+            Array.Resize(ref _items, _items.Length * 2);
 
-        if (_count == _items.Length)
-        {
-            Resize(_items.Length * 2);
-        }
-        _items[_count] = item;
-        _count++;
+        _items[Count++] = item;
     }
 
     public T Pop()
     {
-        if (IsEmpty())
-            throw new InvalidOperationException("Стек пуст!");
-
-        _count--;
-        T item = _items[_count];
-        _items[_count] = default!; 
+        T item = Peek();
+        _items[--Count] = default!; // освобождаем ссылку
         return item;
     }
 
@@ -98,55 +97,36 @@ public class MyStack<T>
         if (IsEmpty())
             throw new InvalidOperationException("Стек пуст!");
 
-        return _items[_count - 1];
-    }
-
-    private void Resize(int newSize)
-    {
-        T[] newArray = new T[newSize];
-        Array.Copy(_items, newArray, _count);
-        _items = newArray;
+        return _items[Count - 1];
     }
 }
 
+// Кольцевой буфер: head указывает на первый элемент, место для нового = (head + count) % длина
 public class MyQueue<T>
 {
-    private T[] _items;
-    private int _head; 
-    private int _tail;
-    private int _count;
+    private const int InitialCapacity = 4;
+    private T[] _items = new T[InitialCapacity];
+    private int _head;
 
-    public MyQueue()
-    {
-        _items = new T[4];
-        _head = 0;
-        _tail = 0;
-        _count = 0;
-    }
+    public int Count { get; private set; }
 
-    public int Count => _count;
-    public bool IsEmpty() => _count == 0;
+    public bool IsEmpty() => Count == 0;
 
     public void Enqueue(T item)
     {
-        if (_count == _items.Length)
-        {
-            Resize(_items.Length * 2);
-        }
-        _items[_tail] = item;
-        _tail = (_tail + 1) % _items.Length;
-        _count++;
+        if (Count == _items.Length)
+            Grow();
+
+        _items[(_head + Count) % _items.Length] = item;
+        Count++;
     }
 
     public T Dequeue()
     {
-        if (IsEmpty())
-            throw new InvalidOperationException("Очередь пуста!");
-
-        T item = _items[_head];
+        T item = Peek();
         _items[_head] = default!;
         _head = (_head + 1) % _items.Length;
-        _count--;
+        Count--;
         return item;
     }
 
@@ -158,18 +138,14 @@ public class MyQueue<T>
         return _items[_head];
     }
 
-    private void Resize(int newSize)
+    private void Grow()
     {
-        T[] newArray = new T[newSize];
+        var newItems = new T[_items.Length * 2];
 
-        
-        for (int i = 0; i < _count; i++)
-        {
-            newArray[i] = _items[(_head + i) % _items.Length];
-        }
+        for (int i = 0; i < Count; i++)
+            newItems[i] = _items[(_head + i) % _items.Length];
 
-        _items = newArray;
+        _items = newItems;
         _head = 0;
-        _tail = _count;
     }
 }

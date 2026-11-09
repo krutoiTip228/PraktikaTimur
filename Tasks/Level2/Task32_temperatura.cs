@@ -2,6 +2,7 @@ using System;
 using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
+
 public class Task32_temperatura : ITask
 {
     public string Title => "Свойства с валидацией (Temperature)";
@@ -16,17 +17,17 @@ public class Task32_temperatura : ITask
 
     public void Run()
     {
-        Temperature temp = new Temperature();
+        var temperature = new Temperature();
 
         Console.WriteLine("Корректное присваивание");
-        temp.Celsius = 25.0;
-        Console.WriteLine($"Температура: {temp.Celsius}°C");
-        Console.WriteLine($"По Фаренгейту: {temp.Fahrenheit:F2}°F\n");
+        temperature.Celsius = 25.0;
+        Console.WriteLine($"Температура: {temperature.Celsius}°C");
+        Console.WriteLine($"По Фаренгейту: {temperature.Fahrenheit:F2}°F\n");
 
         Console.WriteLine("Некорректное присваивание");
         try
         {
-            temp.Celsius = -300.0;
+            temperature.Celsius = -300.0;
         }
         catch (ArgumentOutOfRangeException ex)
         {
@@ -37,34 +38,24 @@ public class Task32_temperatura : ITask
 
 public class Temperature
 {
-
+    private const double AbsoluteZero = -273.15;
     private double _celsius;
-
 
     public double Celsius
     {
-        get
-        {
-            return _celsius;
-        }
+        get => _celsius;
         set
         {
-
-            if (value < -273.15)
+            if (value < AbsoluteZero)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(value),
-                    "Температура не может быть ниже абсолютного нуля (-273.15°C)!");
+                    $"Температура не может быть ниже абсолютного нуля ({AbsoluteZero}°C)!");
             }
+
             _celsius = value;
         }
     }
 
-    public double Fahrenheit
-    {
-        get
-        {
-            return _celsius * 9 / 5 + 32;
-        }
-    }
+    public double Fahrenheit => _celsius * 9 / 5 + 32;
 }

@@ -3,6 +3,7 @@ using System.IO;
 using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
+
 public class Task31_IDisposable : ITask
 {
     public string Title => "IDisposable + using";
@@ -17,31 +18,29 @@ public class Task31_IDisposable : ITask
 
     public void Run()
     {
-        string filePath = "test_idisposable.txt";
-        Console.WriteLine("Способ 1: Блок using");
-        using (FileWriter writer = new FileWriter(filePath))
+        Console.WriteLine("Способ 1: блок using");
+        using (var writer = new FileWriter("test_idisposable.txt"))
         {
             writer.WriteLine("Первая строка");
             writer.WriteLine("Вторая строка");
-    
-        }
-        Console.WriteLine("Файл успешно записан и закрыт (блок using).");
+        } // Dispose вызывается здесь
+        Console.WriteLine("Файл записан и закрыт.");
 
-        Console.WriteLine("\nСпособ 2: Декларация using (using var)");
+        Console.WriteLine("\nСпособ 2: using-декларация (using var)");
         using var writer2 = new FileWriter("test_idisposable_2.txt");
         writer2.WriteLine("Строка из using-декларации");
-        Console.WriteLine("Файлы созданы. Проверьте папку bin/Debug/netX.X/");
-        Console.WriteLine("Если попытаться записать в закрытый файл, будет ошибка.");
+        Console.WriteLine("Файлы лежат рядом с исполняемым файлом (например, bin/Debug/netX.X/).");
+        Console.WriteLine("writer2 закроется автоматически при выходе из метода Run.");
     }
 }
+
 public class FileWriter : IDisposable
 {
     private readonly StreamWriter _writer;
-    private bool _disposed = false;
+    private bool _disposed;
 
     public FileWriter(string path)
     {
-
         _writer = new StreamWriter(path);
     }
 
@@ -52,13 +51,13 @@ public class FileWriter : IDisposable
 
         _writer.WriteLine(text);
     }
+
     public void Dispose()
     {
-        if (!_disposed)
-        {
-            _writer.Dispose();
-            _disposed = true;
-            Console.WriteLine("[FileWriter] Файл закрыт.");
-        }
+        if (_disposed) return;
+
+        _writer.Dispose();
+        _disposed = true;
+        Console.WriteLine("[FileWriter] Файл закрыт.");
     }
 }

@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
 using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
-
 
 public class Task16_StringExtensions : ITask
 {
@@ -18,56 +16,57 @@ public class Task16_StringExtensions : ITask
 
     public void Run()
     {
-        string text1 = "А роза упала на лапу Азора";
-        string text2 = "Hello, World!";
-        string text3 = "C# is awesome";
+        string palindromeText = "А роза упала на лапу Азора";
+        string wordsText = "Hello, World!";
+        string reverseText = "C# is awesome";
 
-        Console.WriteLine($"Строка: \"{text1}\"");
-        Console.WriteLine($"Палиндром? {text1.IsPalindrome()}");
-        Console.WriteLine();
+        Console.WriteLine($"Строка: \"{palindromeText}\"");
+        Console.WriteLine($"Палиндром? {palindromeText.IsPalindrome()}\n");
 
+        Console.WriteLine($"Строка: \"{wordsText}\"");
+        Console.WriteLine($"Количество слов: {wordsText.WordCount()}\n");
 
-        Console.WriteLine($"Строка: \"{text2}\"");
-        Console.WriteLine($"Количество слов: {text2.WordCount()}");
-        Console.WriteLine();
-
-
-        Console.WriteLine($"Строка: \"{text3}\"");
-        Console.WriteLine($"Реверс: \"{text3.ReverseString()}\"");
+        Console.WriteLine($"Строка: \"{reverseText}\"");
+        Console.WriteLine($"Реверс: \"{reverseText.ReverseString()}\"");
     }
 }
 
-
 public static class StringExtensions
 {
- 
-    public static bool IsPalindrome(this string str)
+    private static readonly char[] WordSeparators = { ' ', '.', ',', '!', '?', ':', ';' };
+
+    // Два указателя навстречу друг другу, пропуская не-буквы и не-цифры
+    public static bool IsPalindrome(this string text)
     {
-        if (string.IsNullOrEmpty(str)) return true;
+        int left = 0;
+        int right = text.Length - 1;
 
-  
-        var clean = new string(str.ToLower().Where(char.IsLetterOrDigit).ToArray());
+        while (left < right)
+        {
+            if (!char.IsLetterOrDigit(text[left])) { left++; continue; }
+            if (!char.IsLetterOrDigit(text[right])) { right--; continue; }
 
+            if (char.ToLower(text[left]) != char.ToLower(text[right]))
+                return false;
 
-        return clean == new string(clean.Reverse().ToArray());
+            left++;
+            right--;
+        }
+
+        return true;
     }
 
-    public static int WordCount(this string str)
+    public static int WordCount(this string text)
     {
-        if (string.IsNullOrWhiteSpace(str)) return 0;
-
-      
-        string[] words = str.Split(new[] { ' ', '.', ',', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
-        return words.Length;
+        return string.IsNullOrWhiteSpace(text)
+            ? 0
+            : text.Split(WordSeparators, StringSplitOptions.RemoveEmptyEntries).Length;
     }
 
-
-    public static string ReverseString(this string str)
+    public static string ReverseString(this string text)
     {
-        if (string.IsNullOrEmpty(str)) return str;
-
-        char[] chars = str.ToCharArray();
-        Array.Reverse(chars); 
+        char[] chars = text.ToCharArray();
+        Array.Reverse(chars);
         return new string(chars);
     }
 }

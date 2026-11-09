@@ -4,6 +4,7 @@ using System.Linq;
 using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
+
 public class Task34_GrupirSlov : ITask
 {
     public string Title => "LINQ: группировка слов по букве";
@@ -19,7 +20,7 @@ public class Task34_GrupirSlov : ITask
 
     public void Run()
     {
-        List<string> words = new List<string>
+        var words = new List<string>
         {
             "Яблоко", "Арбуз", "Банан", "Апельсин", "Брусника",
             "Вишня", "Виноград", "Авокадо", "Ягода", "Барбарис",
@@ -28,23 +29,17 @@ public class Task34_GrupirSlov : ITask
 
         Console.WriteLine("Исходный список слов:");
         Console.WriteLine(string.Join(", ", words));
-        Console.WriteLine();
 
-    
-        var groupedWords = words
-            .Select(w => w.ToLower())
-            .OrderBy(w => w)
-            .GroupBy(w => w[0])
+        var groups = words
+            .GroupBy(w => char.ToUpper(w[0]))
             .OrderBy(g => g.Key);
 
-        Console.WriteLine("--- Сгруппированные слова ---");
-        foreach (var group in groupedWords)
+        Console.WriteLine("\n--- Сгруппированные слова ---");
+        foreach (var group in groups)
         {
-            string wordsInGroup = string.Join(", ", group);
-
-            char letter = char.ToUpper(group.Key);
-
-            Console.WriteLine($"{letter}: {wordsInGroup}");
+            // Слова внутри группы сортируем отдельно, регистр исходных слов сохраняется
+            string line = string.Join(", ", group.OrderBy(w => w));
+            Console.WriteLine($"{group.Key}: {line}");
         }
     }
 }

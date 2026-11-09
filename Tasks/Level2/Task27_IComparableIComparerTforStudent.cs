@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CSharpPraktikum.Common;
 
 namespace CSharpPraktikum.Tasks.Level2;
+
 public class Task27_IComparableIComparerTforStudent : ITask
 {
     public string Title => "Сортировка Student (IComparable / IComparer)";
@@ -14,49 +15,40 @@ public class Task27_IComparableIComparerTforStudent : ITask
         "Реализовать IComparer<Student> ByNameComparer — сортировка по имени",
         "Продемонстрировать обе сортировки на List<Student>"
     };
+
     public void Run()
     {
-        List<Student> students = new List<Student>
+        var students = new List<Student>
         {
-            new Student("Инокентий", 1.2),
-            new Student("Антон", 3.4),
-            new Student("Марк", 4.2),
-            new Student("Павел", 5.0),
+            new("Инокентий", 1.2),
+            new("Антон", 3.4),
+            new("Марк", 4.2),
+            new("Павел", 5.0)
         };
+
         Console.WriteLine("Исходный список");
         PrintList(students);
 
-
-        students.Sort();
-
-
-        Console.WriteLine("Сортировка по среднему баллу");
+        students.Sort(); // IComparable<Student>: по среднему баллу, по убыванию
+        Console.WriteLine("\nСортировка по среднему баллу (убывание)");
         PrintList(students);
 
-
-
-        students.Sort(new ByNameComparer());
-
-        Console.WriteLine("Сортировка по имени");
+        students.Sort(new ByNameComparer()); // IComparer<Student>: по имени
+        Console.WriteLine("\nСортировка по имени");
         PrintList(students);
-
-
     }
 
-    private void PrintList(List<Student> list)
+    private static void PrintList(List<Student> students)
     {
-        foreach (var s in list)
-        {
-            Console.WriteLine($"  {s.Name,-10} | Балл: {s.AverageGrade}");
-        }
+        foreach (Student student in students)
+            Console.WriteLine($"  {student.Name,-10} | Балл: {student.AverageGrade}");
     }
 }
 
-
 public class Student : IComparable<Student>
 {
-    public string Name { get; set; }
-    public double AverageGrade { get; set; }
+    public string Name { get; }
+    public double AverageGrade { get; }
 
     public Student(string name, double averageGrade)
     {
@@ -64,11 +56,10 @@ public class Student : IComparable<Student>
         AverageGrade = averageGrade;
     }
 
+    // Аргументы поменяны местами, чтобы получить порядок по убыванию
     public int CompareTo(Student? other)
     {
-        if (other == null) return 1;
-
-        return other.AverageGrade.CompareTo(this.AverageGrade);
+        return other is null ? 1 : other.AverageGrade.CompareTo(AverageGrade);
     }
 }
 
@@ -76,8 +67,6 @@ public class ByNameComparer : IComparer<Student>
 {
     public int Compare(Student? x, Student? y)
     {
-        if (x == null || y == null) return 0;
-       
-        return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
+        return string.CompareOrdinal(x?.Name, y?.Name);
     }
 }
