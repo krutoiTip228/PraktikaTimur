@@ -17,30 +17,25 @@ public class Task26_PatternStrategy : ITask
 
     public void Run()
     {
-        decimal originalPrice = 1000m; 
+        const decimal price = 1000m;
+        Console.WriteLine($"Исходная цена: {price} руб.\n");
 
-        Console.WriteLine($"Исходная цена: {originalPrice} руб.\n");
+        PrintPrice("Обычный клиент", new NoDiscount(), price);
+        PrintPrice("VIP клиент", new VipDiscount(), price);
+        PrintPrice("С промокодом", new PromoDiscount(), price);
+    }
 
-      
-        var calc1 = new PriceCalculator(new NoDiscount());
-        Console.WriteLine($"Обычный клиент: {calc1.CalculateFinalPrice(originalPrice)} руб.");
-
-
-        var calc2 = new PriceCalculator(new VipDiscount());
-        Console.WriteLine($"VIP клиент:     {calc2.CalculateFinalPrice(originalPrice)} руб.");
-
-
-        var calc3 = new PriceCalculator(new PromoDiscount());
-        Console.WriteLine($"С промокодом:   {calc3.CalculateFinalPrice(originalPrice)} руб.");
+    private static void PrintPrice(string label, IDiscountStrategy strategy, decimal price)
+    {
+        var calculator = new PriceCalculator(strategy);
+        Console.WriteLine($"{label,-15}: {calculator.CalculateFinalPrice(price)} руб.");
     }
 }
-
 
 public interface IDiscountStrategy
 {
     decimal Apply(decimal price);
 }
-
 
 public class NoDiscount : IDiscountStrategy
 {
@@ -49,28 +44,22 @@ public class NoDiscount : IDiscountStrategy
 
 public class VipDiscount : IDiscountStrategy
 {
-    public decimal Apply(decimal price) => price * 0.90m; 
+    public decimal Apply(decimal price) => price * 0.90m; // скидка 10%
 }
 
 public class PromoDiscount : IDiscountStrategy
 {
-    public decimal Apply(decimal price) => price * 0.80m; 
+    public decimal Apply(decimal price) => price * 0.80m; // скидка 20%
 }
-
 
 public class PriceCalculator
 {
     private readonly IDiscountStrategy _strategy;
 
-   
     public PriceCalculator(IDiscountStrategy strategy)
     {
         _strategy = strategy;
     }
 
-    public decimal CalculateFinalPrice(decimal price)
-    {
-     
-        return _strategy.Apply(price);
-    }
+    public decimal CalculateFinalPrice(decimal price) => _strategy.Apply(price);
 }

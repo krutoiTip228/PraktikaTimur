@@ -5,59 +5,73 @@ namespace CSharpPraktikum.Tasks.Level1;
 
 public class Task11_Matrix : ITask
 {
+    private const int MinSize = 2;
 
     public string Title => "11.Диагональ матрицы N*N";
     public string Description => "найти сумму элементов главной диагонали матрицы N*N";
-    public string[] Requirements => new[] {
-
-    "Размер N вводится пользователем (минимум 2).",
-    "Матрица заполняется случайными числами.",
-    "Сумма считается без LINQ, в одном цикле for.",
-    "Вывести саму матрицу и сумму."
-
+    public string[] Requirements => new[]
+    {
+        "Размер N вводится пользователем (минимум 2).",
+        "Матрица заполняется случайными числами.",
+        "Сумма считается без LINQ, в одном цикле for.",
+        "Вывести саму матрицу и сумму."
     };
+
     public void Run()
     {
-        int n = 0;
+        int size = ReadSize();
+        int[,] matrix = CreateRandomMatrix(size);
 
-        while (n < 2)
+        Console.WriteLine("\nВаша матрица:");
+        PrintMatrix(matrix);
+
+        Console.WriteLine($"\nСумма элементов главной диагонали: {DiagonalSum(matrix)}");
+    }
+
+    private static int ReadSize()
+    {
+        while (true)
         {
-            Console.WriteLine("Введите размер матрицы не меньше 2-ух");
-            string? vvod = Console.ReadLine();
-            if (!int.TryParse(vvod, out n) || n < 2)
-            {
-                Console.WriteLine("Ошибка: Нужно ввести число не меньше 2");
-                n = 0;
-            }
+            Console.WriteLine($"Введите размер матрицы (не меньше {MinSize}):");
+
+            if (int.TryParse(Console.ReadLine(), out int size) && size >= MinSize)
+                return size;
+
+            Console.WriteLine($"Ошибка: нужно ввести целое число не меньше {MinSize}");
+        }
+    }
+
+    private static int[,] CreateRandomMatrix(int size)
+    {
+        var random = new Random();
+        var matrix = new int[size, size];
+
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+                matrix[i, j] = random.Next(1, 100);
         }
 
-        int[,] matrix = new int[n, n];
-        Random rand = new Random();
+        return matrix;
+    }
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                matrix[i, j] = rand.Next(1, 100);
-            }
-        }
-        Console.WriteLine("\nВаша Матрица: ");
+    private static void PrintMatrix(int[,] matrix)
+    {
+        int size = matrix.GetLength(0);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < size; i++)
         {
-            for (int j = 0; j < n; j++)
-            {
+            for (int j = 0; j < size; j++)
                 Console.Write($"{matrix[i, j],4} ");
-            }
             Console.WriteLine();
         }
-        int diagonalSum = 0;
+    }
 
-        for (int i = 0; i < n; i++)
-        {
-            diagonalSum += matrix[i, i];
-        }
-        Console.WriteLine($"\nСумма элементов главной диагонали: {diagonalSum}");
-
+    private static int DiagonalSum(int[,] matrix)
+    {
+        int sum = 0;
+        for (int i = 0; i < matrix.GetLength(0); i++)
+            sum += matrix[i, i];
+        return sum;
     }
 }
